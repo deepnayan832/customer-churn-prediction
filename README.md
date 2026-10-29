@@ -1,14 +1,14 @@
 # Customer Churn Prediction
 
-**GitHub Pages target:** <https://deepnayan832.github.io/customer-churn-prediction/>
+**Live GitHub Pages site:** <https://deepnayan832.github.io/customer-churn-prediction/>
 
-The first Pages deployment becomes available after the workflow succeeds and GitHub Pages is configured to use GitHub Actions.
+Published from `main` through GitHub Actions.
 
 An interactive, browser-only model lab for exploring churn patterns in a fictional telecom sample. The app trains two classifiers in the page, evaluates them on held-out rows, shows fitted feature signals, and estimates churn probabilities for customer profiles. It has no backend, account, API key, or paid prediction service.
 
 ## Preview
 
-After deployment, open the GitHub Pages target above in any modern browser. Locally, run the steps in Development and open the Vite URL. The bundled sample and all app assets are included in the static build, so the demo does not need a runtime data download.
+Open the live GitHub Pages site above in any modern browser. Locally, run the steps in Development and open the Vite URL. The bundled sample and all app assets are included in the static build, so the demo does not need a runtime data download.
 
 ## Features
 
@@ -59,7 +59,7 @@ The built site is written to dist/. Vite uses the repository path /customer-chur
 
 The workflow in .github/workflows/pages.yml runs on pushes to main and manual dispatch. It installs Node.js 24 from the lockfile, runs the tests and production build, then deploys dist/ with the official GitHub Pages actions. It requests only contents read, Pages write, and the OIDC token permission.
 
-For a new repository, set **Repository → Settings → Pages → Build and deployment → Source → GitHub Actions**. The Pages target above is only live after the first deployment completes successfully.
+For a new repository, set **Repository → Settings → Pages → Build and deployment → Source → GitHub Actions**. This repository is already configured and deployed at the live URL above.
 
 ## Project license
 
