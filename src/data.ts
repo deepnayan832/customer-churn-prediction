@@ -31,6 +31,8 @@ export const CATEGORICAL_COLUMNS = FEATURE_COLUMNS.filter(
   (column) => !NUMERIC_COLUMNS.includes(column),
 );
 export const REQUIRED_COLUMNS = [...FEATURE_COLUMNS, "Churn"];
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+export const MAX_DATA_ROWS = 100_000;
 
 export const FEATURE_LABELS: Record<FeatureColumn, string> = {
   gender: "Gender",
@@ -163,6 +165,9 @@ export function parseDataset(text: string, source: string): Dataset {
   const rawHeader = table[0];
   if (!rawHeader) throw new Error("The CSV header is missing.");
   const records = table.slice(1);
+  if (records.length > MAX_DATA_ROWS) {
+    throw new Error("The CSV contains too many rows. Import a file with at most 100,000 customer rows.");
+  }
   const headers = rawHeader.map((name, index) =>
     (index === 0 ? name.replace(/^\uFEFF/, "") : name).trim(),
   );
@@ -260,6 +265,9 @@ export function parseDataset(text: string, source: string): Dataset {
   };
 }
 
-export async function parseCsvFile(file: Pick<File, "name" | "text">): Promise<Dataset> {
+export async function parseCsvFile(file: Pick<File, "name" | "size" | "text">): Promise<Dataset> {
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error("The CSV file is too large. Import a file no larger than 10 MB.");
+  }
   return parseDataset(await file.text(), "Uploaded locally: " + file.name);
 }
