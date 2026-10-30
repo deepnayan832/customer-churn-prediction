@@ -124,4 +124,25 @@ describe("CSV dataset parsing", () => {
     expect(parsed.source).toBe("Uploaded locally: customers.csv");
     expect(parsed.rows).toHaveLength(1);
   });
+
+  it("rejects oversized uploads before reading their contents", async () => {
+    const file = {
+      name: "large.csv",
+      size: 10 * 1024 * 1024 + 1,
+      text: async () => {
+        throw new Error("The file should not be read.");
+      },
+    };
+    await expect(parseCsvFile(file)).rejects.toThrow(/no larger than 10 MB/);
+  });
+
+  it("rejects datasets with too many rows", () => {
+    const header = [...FEATURE_COLUMNS, "Churn"].join(",");
+    const rows = Array.from({ length: 100_001 }, () =>
+      [...FEATURE_COLUMNS.map(() => "No"), "No"].join(","),
+    );
+    expect(() => parseDataset([header, ...rows].join("\n"), "large")).toThrow(
+      /at most 100,000 customer rows/,
+    );
+  });
 });

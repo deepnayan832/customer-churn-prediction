@@ -61,6 +61,13 @@ The workflow in .github/workflows/pages.yml runs on pushes to main and manual di
 
 For a new repository, set **Repository → Settings → Pages → Build and deployment → Source → GitHub Actions**. This repository is already configured and deployed at the live URL above.
 
+## Security controls
+
+- Uploaded CSVs are processed locally, capped at 10 MB and 100,000 rows, and never sent to a service.
+- The static page publishes a restrictive Content Security Policy, and user-provided values are HTML-escaped before rendering.
+- CI runs `npm audit`, pins third-party Actions to immutable commit SHAs, and runs CodeQL on pushes, pull requests, and a weekly schedule.
+- Dependabot checks npm packages and GitHub Actions weekly.
+
 ## Project license
 
 The application source code is licensed under the MIT License in LICENSE. The bundled IBM dataset remains under its upstream Apache License 2.0; see public/data/IBM-LICENSE and the attribution above.
