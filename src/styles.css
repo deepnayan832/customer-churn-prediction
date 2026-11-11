@@ -1837,6 +1837,181 @@ summary:focus-visible {
   }
 }
 
+/* ==========================================================================
+   3D IMMERSIVE OBSERVATORY & LIQUID GLASS SYSTEM
+   ========================================================================== */
+.hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 36px;
+  align-items: center;
+  position: relative;
+  padding: 40px 0 32px;
+}
+
+.hero-3d-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(8, 145, 137, 0.12), transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(243, 246, 250, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 28px;
+  box-shadow:
+    0 24px 60px rgba(18, 39, 63, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(8, 145, 137, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-3d-wrapper:hover {
+  box-shadow:
+    0 32px 75px rgba(8, 145, 137, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.retention-3d-canvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+.retention-3d-canvas:active {
+  cursor: grabbing;
+}
+
+.hero-3d-badge {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(8, 145, 137, 0.25);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(8, 145, 137, 0.08);
+  z-index: 2;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 10px rgba(8, 145, 137, 0.8);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.3); }
+}
+
+.hero-3d-stats {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 2;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(227, 233, 240, 0.85);
+  font-size: 12px;
+  color: var(--muted);
+  box-shadow: 0 4px 14px rgba(18, 39, 63, 0.04);
+}
+
+.stat-pill strong {
+  color: var(--teal);
+  font-weight: 750;
+}
+
+.stat-pill.churn strong {
+  color: var(--coral);
+}
+
+/* 3D Tilt Card Specular Lighting Effect */
+.stat-card,
+.panel,
+.candidate-card,
+.source-card,
+.method-card {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-card::after,
+.panel::after,
+.candidate-card::after,
+.source-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+    rgba(255, 255, 255, 0.25) 0%,
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.stat-card:hover::after,
+.panel:hover::after,
+.candidate-card:hover::after,
+.source-card:hover::after {
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .hero-3d-wrapper {
+    min-height: 310px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-3d-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

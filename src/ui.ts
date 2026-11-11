@@ -17,6 +17,8 @@ import {
   type Metrics,
   type Preprocessor,
 } from "./ml";
+import { RetentionOrbScene } from "./3d/RetentionOrbScene";
+import { initAll3DTilts } from "./3d/tilt";
 
 export type ModelKey = "logistic" | "tree";
 
@@ -463,7 +465,19 @@ function methodCards(): string {
   );
 }
 
+let activeRetentionScene: RetentionOrbScene | null = null;
+let activeTiltsCleanup: (() => void) | null = null;
+
 export function renderDashboard(root: HTMLElement, state: DashboardState): void {
+  if (activeRetentionScene) {
+    activeRetentionScene.destroy();
+    activeRetentionScene = null;
+  }
+  if (activeTiltsCleanup) {
+    activeTiltsCleanup();
+    activeTiltsCleanup = null;
+  }
+
   const rows = state.dataset.rows;
   const churnCount = countClass(rows, "Yes");
   const churnRate = rows.length ? churnCount / rows.length : 0;
@@ -472,7 +486,7 @@ export function renderDashboard(root: HTMLElement, state: DashboardState): void 
   const missingCells = Object.values(state.dataset.missing).reduce((sum, value) => sum + value, 0);
   root.innerHTML =
     '<header class="topbar"><a class="brand" href="#top" aria-label="Customer Churn Prediction home"><span class="brand-mark">C</span><span>Churn<span class="brand-light">Lab</span><small>MODEL OBSERVATORY</small></span></a><nav aria-label="Main navigation"><a href="#overview">Overview</a><a href="#dataset">Dataset</a><a href="#models">Model lab</a><a href="#predict">Predict</a></nav><div class="topbar-actions"><span class="privacy-chip"><span></span>Runs in your browser</span><button class="button quiet" type="button" data-action="reset">Reset demo</button></div></header>' +
-    '<main id="main" class="page-shell"><section id="top" class="hero"><div class="hero-copy"><span class="eyebrow">CUSTOMER CHURN PREDICTION</span><h1>See the signals.<br><span>Test the models.</span></h1><p>Explore churn patterns, compare two explainable classifiers, and score a customer profile. Your uploaded CSV stays in this browser.</p><div class="hero-actions"><a class="button primary" href="#models">Start analysis <span aria-hidden="true">↘</span></a><button class="button secondary" type="button" data-action="upload">Import CSV</button><input id="csv-file" type="file" accept=".csv,text/csv" hidden><span class="format-note">CSV · no server upload</span></div></div><aside class="source-card"><div class="source-icon">▤</div><div><span class="eyebrow">CURRENT DATA</span><h2>' + escapeHtml(state.dataset.source) + '</h2><p>Fictional telecom sample · ' + integerFormat.format(rows.length) + ' unique rows</p><a href="#dataset">Inspect source and data quality <span aria-hidden="true">→</span></a></div><span class="source-dot"></span></aside></section>' +
+    '<main id="main" class="page-shell"><section id="top" class="hero"><div class="hero-copy"><span class="eyebrow">CUSTOMER CHURN PREDICTION · 3D OBSERVATORY</span><h1>See the signals.<br><span>Test the models.</span></h1><p>Explore churn patterns, compare explainable classifiers, and score customer profiles with real-time 3D cohort dynamics. Uploaded CSV stays strictly in your browser.</p><div class="hero-actions"><a class="button primary" href="#models">Start analysis <span aria-hidden="true">↘</span></a><button class="button secondary" type="button" data-action="upload">Import CSV</button><input id="csv-file" type="file" accept=".csv,text/csv" hidden><span class="format-note">CSV · no server upload</span></div><aside class="source-card" style="margin-top:20px"><div class="source-icon">▤</div><div><span class="eyebrow">CURRENT DATA</span><h2>' + escapeHtml(state.dataset.source) + '</h2><p>Fictional telecom sample · ' + integerFormat.format(rows.length) + ' unique rows</p><a href="#dataset">Inspect source and data quality <span aria-hidden="true">→</span></a></div><span class="source-dot"></span></aside></div><div class="hero-3d-wrapper" id="retention-3d-mount"><div class="hero-3d-badge"><span class="live-dot"></span><span>3D COHORT DYNAMICS</span></div><div class="hero-3d-stats"><div class="stat-pill"><span>Retained Cohort</span><strong>' + percent(1 - churnRate) + '</strong></div><div class="stat-pill churn"><span>At-Risk / Churn</span><strong>' + percent(churnRate) + '</strong></div></div></div></section>' +
     (state.message ? '<p class="status-banner" role="status">' + escapeHtml(state.message) + "</p>" : "") +
     '<section id="overview" class="section-block"><div class="section-head"><div><span class="eyebrow">AT A GLANCE</span><h2>Customer overview</h2></div><span class="population-note">Population: currently loaded rows</span></div><div class="stats-grid">' +
     statCard("Customers analyzed", integerFormat.format(rows.length), state.dataset.hasCustomerId ? "After duplicate ID checks" : "Imported rows") +
@@ -520,6 +534,12 @@ export function renderDashboard(root: HTMLElement, state: DashboardState): void 
     methodCards() +
     '<div class="responsible-use"><span>!</span><p><strong>Responsible use:</strong> the IBM sample describes fictional telecom customers. Predictions can be wrong; review them with domain knowledge and never use a model score alone for consequential customer decisions. Uploaded rows remain in this page’s memory until reset or reload.</p></div></section></main>' +
     '<footer class="footer"><a class="brand footer-brand" href="#top"><span class="brand-mark">C</span><span>Churn<span class="brand-light">Lab</span></span></a><p>Educational model lab · no external prediction service</p><a href="https://github.com/IBM/telco-customer-churn-on-icp4d" target="_blank" rel="noreferrer">IBM dataset source ↗</a></footer>';
+
+  const mount3d = root.querySelector<HTMLElement>("#retention-3d-mount");
+  if (mount3d) {
+    activeRetentionScene = new RetentionOrbScene(mount3d, churnRate);
+  }
+  activeTiltsCleanup = initAll3DTilts(root);
 }
 
 export function updateThresholdView(root: HTMLElement, state: DashboardState): void {
