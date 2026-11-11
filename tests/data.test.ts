@@ -138,9 +138,7 @@ describe("CSV dataset parsing", () => {
 
   it("rejects datasets with too many rows", () => {
     const header = [...FEATURE_COLUMNS, "Churn"].join(",");
-    const rows = Array.from({ length: 100_001 }, () =>
-      [...FEATURE_COLUMNS.map(() => "No"), "No"].join(","),
-    );
+    const rows = Array.from({ length: 100_001 }, () => "x");
     expect(() => parseDataset([header, ...rows].join("\n"), "large")).toThrow(
       /at most 100,000 customer rows/,
     );
